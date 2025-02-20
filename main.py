@@ -1,13 +1,14 @@
 import sys
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtQuick import QQuickView
+from PySide6.QtQml import QQmlApplicationEngine
 
 if __name__ == "__main__":
-    app = QGuiApplication()
-    view = QQuickView()
-    view.engine().addImportPath(sys.path[0])
-    view.loadFromModule("App", "Main")
-    view.show()
-    ex = app.exec()
-    del view
-    sys.exit(ex)
+    app = QGuiApplication(sys.argv)
+    engine = QQmlApplicationEngine()
+    engine.addImportPath(sys.path[0])
+    engine.loadFromModule("App", "Main")
+    if not engine.rootObjects():
+        sys.exit(-1)
+    exit_code = app.exec()
+    del engine
+    sys.exit(exit_code)

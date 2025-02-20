@@ -1,2 +1,2 @@
-module App
+module QmlIntegration
 Main 254.0 main.qml
