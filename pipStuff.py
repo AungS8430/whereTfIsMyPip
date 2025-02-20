@@ -28,7 +28,7 @@ class Info:
     required_by: str | None = None
 
 
-def get_installed(python_version: Version | None=None) -> list[tuple[str, str]]:
+def pip_list(python_version: Version | None=None) -> list[tuple[str, str]]:
     pip_arg = ["python", "-m", "pip", "list"]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
@@ -42,14 +42,21 @@ def get_installed(python_version: Version | None=None) -> list[tuple[str, str]]:
     return out
 
 
-def install_pip(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+def pip_install(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
     pip_arg = ["python", "-m", "pip", "install", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     return subprocess.run(pip_arg, capture_output=True)
 
 
-def get_package_info(package: str, python_version: Version | None=None) -> Info:
+def pip_remove(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+    pip_arg = ["python", "-m", "pip", "uninstall", package]
+    if python_version != None:
+        pip_arg[0] = f"python{python_version}"
+    return subprocess.run(pip_arg, capture_output=True)
+
+
+def pip_show(package: str, python_version: Version | None=None) -> Info:
     pip_arg = ["python", "-m", "pip", "show", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
@@ -60,7 +67,7 @@ def get_package_info(package: str, python_version: Version | None=None) -> Info:
     return Info(results[0], results[1], results[2], results[3], results[4], results[5], results[6], results[7], results[8], results[9])
 
 
-def ensure_pip(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+def pip_ensure(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
     pip_arg = ["python", "-m", "ensurepip", "install", "--upgrade"]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
