@@ -14,6 +14,17 @@ class Version:
         return f"{self.major}.{self.minor}"
 
 
+    def __lt__(self, obj):
+        if self.major != obj.major:
+            return self.major < obj.major
+        return self.minor < obj.minor
+
+    def __gt__(self, obj):
+        if self.major != obj.major:
+            return self.major > obj.major
+        return self.minor > obj.minor
+
+
 @dataclass()
 class Info:
     name: str | None
@@ -84,4 +95,5 @@ def get_all_python_version():
             continue
         if result.lstrip("python3.").isdecimal():
             out.append(Version(3, int(result.lstrip("python3."))))
+    out.sort(reverse=True)
     return out
