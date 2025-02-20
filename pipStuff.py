@@ -72,3 +72,16 @@ def pip_ensure(package: str, python_version: Version | None=None) -> subprocess.
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     return subprocess.run(pip_arg, capture_output=True)
+
+
+def get_all_python_version():
+    results = subprocess.run(["ls", "/usr/bin"], capture_output=True)
+    results = results.stdout.decode('utf-8')
+    results = results.splitlines()
+    out = []
+    for result in results:
+        if result.find("python3.") == -1:
+            continue
+        if result.lstrip("python3.").isdecimal():
+            out.append(Version(3, int(result.lstrip("python3."))))
+    return out
