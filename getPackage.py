@@ -49,3 +49,4 @@ def getInfo(packages, query):
     if query not in packages:
         return 1
     result = pkgInfo.from_dict(requests.get(f"https://pypi.org/pypi/{query}/json").json()["info"])
+    return result
