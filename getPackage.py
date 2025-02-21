@@ -1,38 +1,6 @@
-import dataclasses
-from dataclasses import dataclass
+from Datastruct import pkgInfo
 import requests
-import inspect
 
-@dataclass()
-class pkgUrls:
-    Documentation: str | None
-    Homepage: str | None
-    Source: str | None
-
-@dataclass()
-class pkgInfo:
-    author: str | None
-    author_email: str | None
-    bugtrack_url: str | None
-    classifiers: list | None
-    description: str | None
-    description_content_type: str | None
-    docs_url: str | None
-    home_page: str | None
-    license: str | None
-    name: str | None
-    package_url: str | None
-    project_url: pkgUrls | None
-    requires_dist: list | None
-    requires_python: str | None
-    summary: str | None
-    version: str | None
-    @classmethod
-    def from_dict(cls, env):      
-        return cls(**{
-            k: v for k, v in env.items() 
-            if k in inspect.signature(cls).parameters
-        })
 
 def get():
     r = requests.get("https://pypi.org/simple/")

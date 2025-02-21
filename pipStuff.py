@@ -1,4 +1,5 @@
 import subprocess
+from Datastruct import pkgInfo
 from dataclasses import dataclass
 
 
@@ -13,7 +14,6 @@ class Version:
     def __str__(self):
         return f"{self.major}.{self.minor}"
 
-
     def __lt__(self, obj):
         if self.major != obj.major:
             return self.major < obj.major
@@ -25,21 +25,7 @@ class Version:
         return self.minor > obj.minor
 
 
-@dataclass()
-class Info:
-    name: str | None
-    version: str | None
-    summary: str | None = None
-    homepage: str | None = None
-    author: str | None = None
-    author_email: str | None = None
-    license: str | None = None
-    location: str | None = None
-    requires: str | None = None
-    required_by: str | None = None
-
-
-def pip_list(python_version: Version | None=None) -> list[tuple[str, str]]:
+def pip_list(python_version: Version | None=None) -> list[pkgInfo]:
     pip_arg = ["python", "-m", "pip", "list"]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
@@ -49,9 +35,8 @@ def pip_list(python_version: Version | None=None) -> list[tuple[str, str]]:
     results = results[2::]
     out = []
     for result in results:
-        out.append(Info(result.split()[0], result.split()[1]))
+        out.append(pkgInfo(name=result.split()[0],version=result.split()[1]))
     return out
-
 
 def pip_install(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
     pip_arg = ["python", "-m", "pip", "install", package]
@@ -59,15 +44,13 @@ def pip_install(package: str, python_version: Version | None=None) -> subprocess
         pip_arg[0] = f"python{python_version}"
     return subprocess.run(pip_arg, capture_output=True)
 
-
 def pip_remove(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
     pip_arg = ["python", "-m", "pip", "uninstall", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     return subprocess.run(pip_arg, capture_output=True)
 
-
-def pip_show(package: str, python_version: Version | None=None) -> Info:
+def pip_show(package: str, python_version: Version | None=None) -> pkgInfo:
     pip_arg = ["python", "-m", "pip", "show", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
@@ -75,15 +58,15 @@ def pip_show(package: str, python_version: Version | None=None) -> Info:
     results = results.stdout.decode('utf-8')
     results = results.splitlines()
     results = [(result.split()[1] if len(result.split()) > 1 else None) for result in results]
-    return Info(results[0], results[1], results[2], results[3], results[4], results[5], results[6], results[7], results[8], results[9])
-
+    return pkgInfo(name=results[0], version=results[1], summary=results[2], home_page=results[3],
+        author =results[4], author_email=results[5], license=results[6], location=results[7],
+        requires_dist=results[8].split() if not results[8] == None else None)
 
 def pip_ensure(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
     pip_arg = ["python", "-m", "ensurepip", "install", "--upgrade"]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     return subprocess.run(pip_arg, capture_output=True)
-
 
 def get_all_python_version():
     results = subprocess.run(["ls", "/usr/bin"], capture_output=True)
