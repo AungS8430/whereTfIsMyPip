@@ -1,5 +1,6 @@
 from Datastruct import pkgInfo
 import requests
+import json
 import eel
 
 @eel.expose
@@ -23,8 +24,11 @@ def search(packages, filter=[], query=""):
     return result
 
 @eel.expose
-def getInfo(packages, query):
-    if query not in packages:
-        return 1
+def getInfo(query):
     result = pkgInfo.from_dict(requests.get(f"https://pypi.org/pypi/{query}/json").json()["info"])
-    return str(result.__dict__)
+    return json.dumps(result.__dict__)
+
+@eel.expose
+def getDesc(query):
+    result = requests.get(f"https://pypi.org/pypi/{query}/json").json()["info"]["description"]
+    return result

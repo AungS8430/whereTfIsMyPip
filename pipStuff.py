@@ -41,6 +41,7 @@ def pip_list(python_version: Version | None=None) -> list[pkgInfo]:
 
 @eel.expose
 def pip_install(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+    print(package)
     pip_arg = ["python", "-m", "pip", "install", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
@@ -48,7 +49,14 @@ def pip_install(package: str, python_version: Version | None=None) -> subprocess
 
 @eel.expose
 def pip_remove(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
-    pip_arg = ["python", "-m", "pip", "uninstall", package]
+    pip_arg = ["python", "-m", "pip", "uninstall", "--yes", package]
+    if python_version != None:
+        pip_arg[0] = f"python{python_version}"
+    return subprocess.run(pip_arg, capture_output=True)
+
+@eel.expose
+def pip_upgrade(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+    pip_arg = ["python", "-m", "pip", "install", "--upgrade", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     return subprocess.run(pip_arg, capture_output=True)
@@ -62,7 +70,7 @@ def pip_show(package: str, python_version: Version | None=None) -> pkgInfo:
     results = results.stdout.decode('utf-8')
     results = results.splitlines()
     results = [(result.split()[1] if len(result.split()) > 1 else None) for result in results]
-    return str(pkgInfo(name=results[0], version=results[1], summary=results[2], home_page=results[3],
+    return json.dumps(pkgInfo(name=results[0], version=results[1], summary=results[2], home_page=results[3],
         author =results[4], author_email=results[5], license=results[6], location=results[7],
         requires_dist=results[8].split() if not results[8] == None else None).__dict__)
 
