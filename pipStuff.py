@@ -46,7 +46,7 @@ def pip_install(package: str, python_version: Version | None=None) -> int | str:
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     results = subprocess.run(pip_arg, capture_output=True)
-    if results.returncode == 0:
+    if results.returncode != 0:
         return results.stdout.decode('utf-8')
     return 0
 
@@ -56,7 +56,7 @@ def pip_remove(package: str, python_version: Version | None=None) -> int | str:
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     results = subprocess.run(pip_arg, capture_output=True)
-    if results.returncode == 0:
+    if results.returncode != 0:
         return results.stdout.decode('utf-8')
     return 0
 
@@ -66,7 +66,7 @@ def pip_upgrade(package: str, python_version: Version | None=None) -> int | str:
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     results = subprocess.run(pip_arg, capture_output=True)
-    if results.returncode == 0:
+    if results.returncode != 0:
         return results.stdout.decode('utf-8')
     return 0
 
