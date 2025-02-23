@@ -126,7 +126,8 @@ async function main() {
 
 async function get(query=0, def=false) {
     async function generateResult(db, filter=[], query="", all=false) {
-        if (query.trim().length === 0) return db.slice(0, 30);
+        if (query.trim().length === 0 && all == false) return db.slice(0, 30);
+        if (query.trim().length === 0 && all == true) return db;
         async function search(db, query) {
             let result = await eel.search(db, filter, query, all)();
             return result;
