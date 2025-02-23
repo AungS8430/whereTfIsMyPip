@@ -3,6 +3,7 @@ import requests
 import json
 import eel
 
+
 @eel.expose
 def get():
     r = requests.get("https://pypi.org/simple/")
@@ -13,10 +14,12 @@ def get():
 
 @eel.expose
 def search(packages, filter=[], query=""):
+    filter = set(filter)
     result = []
     count = 0
+    leng = len(query)
     for package in packages:
-        if package.startswith(query) and package not in filter:
+        if package[:leng] == query and package not in filter:
             result.append(package)
             count += 1
             if count >= 30:
