@@ -13,7 +13,7 @@ def get():
     return packages
 
 @eel.expose
-def search(packages, filter=[], query=""):
+def search(packages, filter=[], query="", all=False):
     filter = set(filter)
     result = []
     count = 0
@@ -22,7 +22,7 @@ def search(packages, filter=[], query=""):
         if package[:leng] == query and package not in filter:
             result.append(package)
             count += 1
-            if count >= 30:
+            if count >= 30 and not all:
                 break
     return result
 
