@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import inspect
 
-
 @dataclass()
 class pkgUrls:
     Documentation: str | None

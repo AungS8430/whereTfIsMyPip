@@ -1,10 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html class="dark">
     <head>
         <meta charset="UTF-8">
         <link rel="stylesheet" href="./css/main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script type="text/javascript" src="/eel.js"></script>
+        <script type="text/javascript" src="./js/main.js"></script>
     </head>
-    <body>
-        <p>hello world</p>
+    <body class="text-sm overflow-hidden">
+        <div class="h-screen w-[25%] bg-gray-800 p-2">
+            <div class="text-gray-100">
+                <p class="font-bold">Browse Packages</p>
+                <input type="text" placeholder="Search..." class="p-1 w-full rounded-md focus:outline-none" id="search" class="text-gray-300">
+            </div>
+            <div class="mt-2 overflow-auto h-[calc(100vh-71px)]">
+                <a href="#installed"><button type="button" id="installedBtn" class="w-full bg-gray-800 font-black hover:bg-gray-700 rounded-lg sticky top-0">Installed</button></a>
+                <div id="installed" class="-mt-4 pt-4 grid grid-cols-1 gap-1"></div>
+                <a href="#recommended"><button type="button" id="recommendedBtn" class="w-full bg-gray-800 font-black hover:bg-gray-700 rounded-lg sticky top-5">Recommended</button></a>
+                <div id="recommended" class="-mt-4 pt-4 grid grid-cols-1 gap-1"></div>
+            </div>
+        </div>
     </body>
 </html>
