@@ -26,7 +26,7 @@ class Version:
         return self.minor > obj.minor
 
 @eel.expose
-def pip_list(python_version: Version | None=None) -> list[pkgInfo]:
+def pip_list(python_version: Version | None=None) -> list[str]:
     pip_arg = ["python", "-m", "pip", "list"]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
@@ -40,29 +40,38 @@ def pip_list(python_version: Version | None=None) -> list[pkgInfo]:
     return out
 
 @eel.expose
-def pip_install(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+def pip_install(package: str, python_version: Version | None=None) -> int | str:
     print(package)
     pip_arg = ["python", "-m", "pip", "install", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
-    return subprocess.run(pip_arg, capture_output=True)
+    results = subprocess.run(pip_arg, capture_output=True)
+    if results.returncode == 0:
+        return results.stdout.decode('utf-8')
+    return 0
 
 @eel.expose
-def pip_remove(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+def pip_remove(package: str, python_version: Version | None=None) -> int | str:
     pip_arg = ["python", "-m", "pip", "uninstall", "--yes", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
-    return subprocess.run(pip_arg, capture_output=True)
+    results = subprocess.run(pip_arg, capture_output=True)
+    if results.returncode == 0:
+        return results.stdout.decode('utf-8')
+    return 0
 
 @eel.expose
-def pip_upgrade(package: str, python_version: Version | None=None) -> subprocess.CompletedProcess:
+def pip_upgrade(package: str, python_version: Version | None=None) -> int | str:
     pip_arg = ["python", "-m", "pip", "install", "--upgrade", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
-    return subprocess.run(pip_arg, capture_output=True)
+    results = subprocess.run(pip_arg, capture_output=True)
+    if results.returncode == 0:
+        return results.stdout.decode('utf-8')
+    return 0
 
 @eel.expose
-def pip_show(package: str, python_version: Version | None=None) -> pkgInfo:
+def pip_show(package: str, python_version: Version | None=None) -> str:
     pip_arg = ["python", "-m", "pip", "show", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
