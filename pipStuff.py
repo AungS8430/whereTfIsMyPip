@@ -41,7 +41,6 @@ def pip_list(python_version: Version | None=None) -> list[str]:
 
 @eel.expose
 def pip_install(package: str, python_version: Version | None=None) -> int | str:
-    print(package)
     pip_arg = ["python", "-m", "pip", "install", package]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"

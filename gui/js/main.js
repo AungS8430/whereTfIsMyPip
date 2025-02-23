@@ -1,27 +1,134 @@
-async function run() {
-    let installedData = await eel.pip_list()();
-    for (let i = 0; i < installedData.length; i++) {
-        installedData[i] = JSON.parse(installedData[i]);
+async function run(mode) {
+    if (mode === "load") {
+        console.log()
+        let installedData = await eel.pip_list()();
+        for (let i = 0; i < installedData.length; i++) {
+            installedData[i] = JSON.parse(installedData[i]);
+        }
+        let installed = installedData.map(pkg => pkg.name);
+        let packages = await eel.get()()
+        return [installed, packages, installedData];
+    } else if (mode === "update") {
+        console.log("update")
+        let installedData = await eel.pip_list()();
+        for (let i = 0; i < installedData.length; i++) {
+            installedData[i] = JSON.parse(installedData[i]);
+        }
+        let installed = installedData.map(pkg => pkg.name);
+        return [installed, installedData];
     }
-    let installed = installedData.map(pkg => pkg.name);
-    let packages = await eel.get()()
-    return [installed, packages, installedData];
 }
 
 let installed, packages, installedData
 
+var sQuery = "";
+
 async function main() {
-    [installed, packages, installedData] = await run();
+    [installed, packages, installedData] = await run("load");
 
     await get(query="", def=true);
 
+    async function getInfo(query, installed) {
+        if (!window.navigator.onLine) {
+            return JSON.parse(await eel.pip_show(query)());
+        } else {
+            return JSON.parse(await eel.getInfo(query)());
+        }
+    }
+
     let search = document.getElementById("search");
     search.addEventListener("keydown", async (event) => {
+        sQuery = search.value;
         if (event.key == "Enter") {await get(search.value);}
+    });
+
+    document.addEventListener("click", async (event) => {
+        if (event.target.nodeName !== "BUTTON") return;
+        let id = event.target.id;
+        if (id.startsWith("pkgitm-")) {
+            let pkg = id.slice(7);
+            info = await getInfo(pkg, installed.includes(pkg));
+            let infoDiv = document.getElementById("info");
+            infoDiv.innerHTML = `<div class="overflow-auto"><div class="float-left"><h1 class="text-4xl font-bold">${info.name}</h1><p>${info.summary}</p></div><div class="float-right"><p>Latest Version: ${info.version}${installed.includes(info.name) ? ` | Installed: ${installedData.filter(d => d.name == info.name)[0].version}` : ""}</p><div class="flex flex-row gap-2">${installed.includes(info.name) ? `${installedData.filter(d => d.name == info.name)[0].version !== info.version ? `<button class="updater-${info.name} font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Update</button>` : ""}<button class="installer-${info.name} font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Uninstall</button>` : `<button class="installer-${info.name} font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Install</button>`}</div></div></div><hr><h3 class="text-xl font-semibold">Description</h3><md-block>${info.description}</md-block><br><p>Author: ${info.author}</p><p>License: ${info.license}</p><p>Home Page: <a href="${info.home_page}">${info.home_page}</a></p><p>Requires: ${info.requires_dist === null ? "No dependencies" : info.requires_dist?.join(', ')}</p>`;
+            return;
+        }
+        let cls = event.target.className.split(" ")[0];
+        if (cls.startsWith("installer")) {
+            let pkg = cls.slice(10);
+            let curr = document.getElementsByClassName(`installer-${pkg}`);
+            if (!installed.includes(pkg)) {
+                for (let i = 0; i < curr.length; i++) {
+                    curr[i].innerText = "Installing..."
+                    curr[i].disabled = true;
+                }
+                res = await eel.pip_install(pkg)()
+                console.log(res)
+                if (res === 0) {
+                    for (let i = 0; i < curr.length; i++) {
+                        curr[i].innerText = "Uninstall";
+                        curr[i].disabled = false;
+                    }
+                } else {
+                    for (let i = 0; i < curr.length; i++) {
+                        curr[i].innerText = "Error!";
+                        curr[i].disabled = false;
+                        await delay(5000)
+                        curr[i].innerText = "Install";
+                    }
+                }
+            } else {
+                for (let i = 0; i < curr.length; i++) {
+                    curr[i].innerText = "Uninstalling..."
+                    curr[i].disabled = true;
+                }
+                res = await eel.pip_remove(pkg)();
+                if (res === 0) {
+                    for (let i = 0; i < curr.length; i++) {
+                        curr[i].innerText = "Install";
+                        curr[i].disabled = false;
+                    }
+                } else {
+                    for (let i = 0; i < curr.length; i++) {
+                        curr[i].innerText = "Error!";
+                        curr[i].disabled = false;
+                        await delay(5000)
+                        curr[i].innerText = "Uninstall";
+                    }
+                }
+            }
+            [installed, installedData] = await run("update");
+            await get(sQuery);
+        } else if (cls.startsWith("updater-")) {
+            let pkg = cls.slice(8);
+            let curr = document.getElementsByClassName(`updater-${pkg}`);
+            for (let i = 0; i < curr.length; i++) {
+                curr[i].innerText = "Updating..."
+                curr[i].disabled = true;
+            }
+            res = await eel.pip_upgrade(pkg)();
+            console.log(res)
+            if (res === 0) {
+                for (let i = 0; i < curr.length; i++) {
+                    curr[i].remove()
+                }
+            } else {
+                for (let i = 0; i < curr.length; i++) {
+                    curr[i].innerText = "Error!";
+                    curr[i].disabled = false;
+                    await delay(5000)
+                    curr[i].innerText = "Update";
+                }
+            }
+            [installed, installedData] = await run("update");
+            await get(sQuery);
+            info = await getInfo(pkg, installed.includes(pkg));
+            let infoDiv = document.getElementById("info");
+            infoDiv.innerHTML = `<div class="overflow-auto"><div class="float-left"><h1 class="text-4xl font-bold">${info.name}</h1><p>${info.summary}</p></div><div class="float-right"><p>Latest Version: ${info.version}${installed.includes(info.name) ? ` | Installed: ${installedData.filter(d => d.name == info.name)[0].version}` : ""}</p><div class="flex flex-row gap-2">${installed.includes(info.name) ? `${installedData.filter(d => d.name == info.name)[0].version !== info.version ? `<button class="updater-${info.name} font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Update</button>` : ""}<button class="installer-${info.name} font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Uninstall</button>` : `<button class="installer-${info.name} font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Install</button>`}</div></div></div><hr><h3 class="text-xl font-semibold">Description</h3><md-block>${info.description}</md-block><br><p>Author: ${info.author}</p><p>License: ${info.license}</p><p>Home Page: <a href="${info.home_page}">${info.home_page}</a></p><p>Requires: ${info.requires_dist === null ? "No dependencies" : info.requires_dist?.join(', ')}</p>`;
+        }
     });
 }
 
-async function get(query="", def=false) {
+async function get(query=0, def=false) {
     async function generateResult(db, filter=[], query="") {
         console.log(query.trim().length === 0)
         if (query.trim().length === 0) return db.slice(0, 30);
@@ -31,46 +138,9 @@ async function get(query="", def=false) {
         }
         return await search(db, query);
     }
-    async function getInfo(query, installed) {
-        if (!window.navigator.onLine) {
-            return JSON.parse(await eel.pip_show(query)());
-        } else {
-            return JSON.parse(await eel.getInfo(query)());
-        }
-    }
     if (query.trim().length === 0) {def = true;}
 
-    let wrapper = document.getElementById("wrapper");
     let infoDiv = document.getElementById("info");
-    wrapper.addEventListener("click", async (event) => {
-        if (event.target.nodeName !== "BUTTON") return;
-        let id = event.target.id;
-        if (id.startsWith("pkgitm-")) {
-            let pkg = id.slice(7);
-            info = await getInfo(pkg, installed.includes(pkg));
-            console.log(info)
-            infoDiv.innerHTML = `<div class="overflow-auto"><div class="float-left"><h1 class="text-4xl font-bold">${info.name}</h1><p>${info.summary}</p></div><div class="float-right"><p>Latest Version: ${info.version}${installed.includes(info.name) ? ` | Installed: ${installedData.filter(d => d.name == info.name)[0].version}` : ""}</p><div class="flex flex-row gap-2">${installed.includes(info.name) ? `${installedData.filter(d => d.name == info.name)[0].version !== info.version ? `<button id="updater-${info.name}" class="font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Update</button>` : ""}<button id="installer-${info.name}" class="font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Uninstall</button>` : `<button id="installer-${info.name}" class="font-normal bg-gray-600 hover:bg-gray-500 p-1 rounded-md flex-grow">Install</button>`}</div></div></div><hr><h3 class="text-xl font-semibold">Description</h3><md-block>${info.description}</md-block><br><p>Author: ${info.author}</p><p>License: ${info.license}</p><p>Home Page: <a href="${info.home_page}">${info.home_page}</a></p><p>Requires: ${info.requires_dist === null ? "No dependencies" : info.requires_dist?.join(', ')}</p>`;
-        }
-    })
-
-    document.addEventListener("click", async (event) => {
-        if (event.target.nodeName !== "BUTTON") return;
-        let id = event.target.id;
-        if (id.startsWith("installer-")) {
-            console.log("clicked")
-            let pkg = id.slice(10);
-            if (!installed.includes(pkg)) {
-                console.log(await eel.pip_install(pkg)())
-            } else {
-                await eel.pip_remove(pkg)();
-            }
-            await get(query);
-        } else if (id.startsWith("updater-")) {
-            let pkg = id.slice(8);
-            await eel.pip_upgrade(pkg)();
-            await get(query);
-        }
-    })
 
     let installedDiv = document.getElementById("installed");
     let recommendedDiv = document.getElementById("recommended");
@@ -92,11 +162,11 @@ async function get(query="", def=false) {
 
     let installedRes = await generateResult(installed, [], query);
     console.log(installedRes);
-    installedDiv.innerHTML = installedRes.map(pkg => `<button id="pkgitm-${pkg}" class="w-full p-1 font-medium rounded-lg hover:bg-gray-700 focus:text-sky-400 focus:bg-gray-900 active:ring">${pkg}<br><button id="installer-${pkg}" class="font-normal bg-gray-600 hover:bg-gray-500 rounded-md w-20">Uninstall</button></button>`).join('');
+    installedDiv.innerHTML = installedRes.map(pkg => `<button id="pkgitm-${pkg}" class="w-full p-1 font-medium rounded-lg hover:bg-gray-700 focus:text-sky-400 focus:bg-gray-900 active:ring">${pkg}<br><button class="installer-${pkg} font-normal bg-gray-600 hover:bg-gray-500 rounded-md w-20">Uninstall</button></button>`).join('');
 
     let recommendedRes = [];
     if (!def) {recommendedRes = await generateResult(packages, installed, query);}
-    recommendedDiv.innerHTML = recommendedRes.map(pkg => `<button id="pkgitm-${pkg}" class="w-full p-1 font-medium rounded-lg hover:bg-gray-700 focus:text-sky-400 focus:bg-gray-900 active:ring">${pkg}<br><button id="installer-${pkg}" class="font-normal bg-gray-600 hover:bg-gray-500 rounded-md w-20">Install</button></button>`).join('');
+    recommendedDiv.innerHTML = recommendedRes.map(pkg => `<button id="pkgitm-${pkg}" class="w-full p-1 font-medium rounded-lg hover:bg-gray-700 focus:text-sky-400 focus:bg-gray-900 active:ring">${pkg}<br><button class="installer-${pkg} font-normal bg-gray-600 hover:bg-gray-500 rounded-md w-20">Install</button></button>`).join('');
 }
 
 window.onload = main;
