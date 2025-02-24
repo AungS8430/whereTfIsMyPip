@@ -9,7 +9,7 @@ GUI package manager for Python
 git clone "https://github.com/AungS8430/whereTfIsMyPip.git"
 ```
 
-### create and activate python venv
+### Create and activate python venv
 
 ```bash
 python -m venv ./
