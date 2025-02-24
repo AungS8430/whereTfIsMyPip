@@ -1,7 +1,20 @@
 # Where TF is my pip
 GUI package manager for Python
 
-## How to Use
+## How to install and use
+
+### Clone the project
+
+```bash
+git clone "https://github.com/AungS8430/whereTfIsMyPip.git"
+```
+
+### create and activate python venv
+
+```bash
+python -m venv ./
+source ./bin/activate
+```
 
 ### Install dependencies
 
@@ -9,10 +22,25 @@ GUI package manager for Python
 pip install -r requirements.txt
 ```
 
-### Run the python file
+### Deactivate python venv 
+Deactivate venv to use it on global or other venv
 
 ```bash
-python main.py
+deactivate
+```
+### Config the bash file
+Enter your venv's python relative path to your run.bash file
+
+```bash
+PATH_TO_PYTHON="./bin/python"
+```
+
+
+### Run the python file using bash
+Run the program in your environment
+
+```bash
+./run.bash
 ```
 
 ## License
