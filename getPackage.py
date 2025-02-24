@@ -2,7 +2,40 @@ from Datastruct import pkgInfo
 import requests
 import json
 import eel
+import time
 
+
+def str_to_int(txt: str, ln: int) -> int:
+    txt = txt[:ln]
+    tem = 0
+    for ch in txt:
+        tem += ord(ch) + (tem << 8)
+    return tem
+
+def lowerBound(arr: list[str], target: int, leng: int):
+    lo = 0
+    hi = len(arr) - 1
+    res = len(arr)
+    while lo <= hi:
+        mid = lo + (hi - lo) // 2
+        if str_to_int(arr[mid], leng) >= target:
+            res = mid
+            hi = mid - 1
+        else:
+            lo = mid + 1
+    return res
+
+def upperBound(arr: list[str], target: int, leng: int):
+    lo, hi = 0, len(arr) - 1
+    res = len(arr)
+    while lo <= hi:
+        mid = lo + (hi - lo) // 2
+        if str_to_int(arr[mid], leng) > target:
+            res = mid
+            hi = mid - 1
+        else:
+            lo = mid + 1
+    return res
 
 @eel.expose
 def get():
@@ -10,20 +43,25 @@ def get():
     packages = str(r.content).split("\\n")[2:-2]
     for i in range(len(packages)):
         packages[i] = packages[i].split(">")[1].split("<")[0]
-    return packages
+    return sorted(packages)
 
 @eel.expose
 def search(packages, filter=[], query="", all=False):
+    st = time.perf_counter()
+    count = 0
     filter = set(filter)
     result = []
-    count = 0
     leng = len(query)
-    for package in packages:
-        if package[:leng] == query and package not in filter:
-            result.append(package)
+    temtxt = str_to_int(query, leng)
+    left = lowerBound(packages, temtxt, leng)
+    right = upperBound(packages, temtxt, leng)
+    for idx in range(left, right):
+        if packages[idx] not in filter:
+            result.append(packages[idx])
             count += 1
-            if count >= 30 and not all:
+            if count > 30 and all:
                 break
+    print(time.perf_counter() - st)
     return result
 
 @eel.expose
