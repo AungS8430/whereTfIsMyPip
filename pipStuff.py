@@ -34,6 +34,7 @@ def pip_list(python_version: Version | None=None) -> list[str]:
     results = results.stdout.decode('utf-8')
     results = results.splitlines()
     results = results[2::]
+    results = sorted(results)
     out = []
     for result in results:
         out.append(json.dumps(pkgInfo(name=result.split()[0],version=result.split()[1]).__dict__))

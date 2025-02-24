@@ -2,14 +2,13 @@ from Datastruct import pkgInfo
 import requests
 import json
 import eel
-import time
 
 
 def str_to_int(txt: str, ln: int) -> int:
     txt = txt[:ln]
     tem = 0
-    for ch in txt:
-        tem += ord(ch) + (tem << 8)
+    for idx in range(ln):
+        tem += (ord(txt[idx]) if idx < len(txt) else 0) + (tem << 8)
     return tem
 
 def lowerBound(arr: list[str], target: int, leng: int):
