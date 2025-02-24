@@ -47,7 +47,6 @@ def get():
 
 @eel.expose
 def search(packages, filter=[], query="", all=False):
-    st = time.perf_counter()
     count = 0
     filter = set(filter)
     result = []
@@ -61,7 +60,6 @@ def search(packages, filter=[], query="", all=False):
             count += 1
             if count > 30 and all:
                 break
-    print(time.perf_counter() - st)
     return result
 
 @eel.expose
