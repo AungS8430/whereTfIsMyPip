@@ -28,7 +28,10 @@ def search(packages, filter=[], query="", all=False):
 
 @eel.expose
 def getInfo(query):
-    result = pkgInfo.from_dict(requests.get(f"https://pypi.org/pypi/{query}/json").json()["info"])
+    try:
+        result = pkgInfo.from_dict(requests.get(f"https://pypi.org/pypi/{query}/json").json()["info"])
+    except:
+        return json.dumps(pkgInfo(name=query, summary="Error: Info not found. Return null instead.").__dict__)
     return json.dumps(result.__dict__)
 
 @eel.expose
