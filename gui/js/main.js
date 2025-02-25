@@ -160,7 +160,7 @@ async function get(query=0, def=false) {
     installedDiv.innerHTML = installedRes.map(pkg => `<button id="pkgitm-${pkg}" class="w-full p-1 font-medium rounded-lg hover:bg-gray-700 focus:text-sky-400 focus:bg-gray-900 active:ring">${pkg}<br><button class="installer-${pkg} font-normal bg-gray-600 hover:bg-gray-500 rounded-md w-20">Uninstall</button></button>`).join('');
 
     let recommendedRes = [];
-    if (!def) {recommendedRes = await generateResult(packages, installed, query, all=true);}
+    if (!def) {recommendedRes = await generateResult([], installed, query, all=false);}
     recommendedDiv.innerHTML = recommendedRes.map(pkg => `<button id="pkgitm-${pkg}" class="w-full p-1 font-medium rounded-lg hover:bg-gray-700 focus:text-sky-400 focus:bg-gray-900 active:ring">${pkg}<br><button class="installer-${pkg} font-normal bg-gray-600 hover:bg-gray-500 rounded-md w-20">Install</button></button>`).join('');
 }
 

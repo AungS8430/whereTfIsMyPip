@@ -2,6 +2,7 @@ from Datastruct import pkgInfo
 import requests
 import json
 import eel
+from functools import cache
 
 
 def str_to_int(txt: str, ln: int) -> int:
@@ -37,6 +38,7 @@ def upperBound(arr: list[str], target: int, leng: int):
     return res
 
 @eel.expose
+@cache
 def get():
     r = requests.get("https://pypi.org/simple/")
     packages = str(r.content).split("\\n")[2:-2]
@@ -46,6 +48,8 @@ def get():
 
 @eel.expose
 def search(packages, filter=[], query="", all=False):
+    if all == False:
+        packages = get()
     count = 0
     filter = set(filter)
     result = []
@@ -57,7 +61,7 @@ def search(packages, filter=[], query="", all=False):
         if packages[idx] not in filter:
             result.append(packages[idx])
             count += 1
-            if count > 30 and all:
+            if count > 100:
                 break
     return result
 
