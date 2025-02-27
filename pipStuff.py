@@ -32,7 +32,7 @@ def pip_list(python_version: Version | None=None) -> list[str]:
         pip_arg[0] = f"python{python_version}"
     results = subprocess.run(pip_arg, capture_output=True)
     results = results.stdout.decode('utf-8')
-    return [json.dumps(x) for x in sorted(json.loads(results), key=(lambda n: n["name"]))]
+    return [json.dumps(x) for x in json.loads(results)]
 
 @eel.expose
 def pip_install(package: str, python_version: Version | None=None) -> int | str:

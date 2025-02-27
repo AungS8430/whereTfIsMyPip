@@ -7,4 +7,11 @@ pre {
     border-radius: 15px;
     background: #1e2939;
     padding: 15px;
+    scrollbar-width: thin;
+}
+
+md-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }

@@ -6,7 +6,7 @@ from functools import cache
 
 
 def str_to_int(txt: str, ln: int) -> int:
-    txt = txt[:ln]
+    txt = txt[:ln].lower()
     tem = 0
     for idx in range(ln):
         tem += (ord(txt[idx]) if idx < len(txt) else 0) + (tem << 8)
@@ -44,7 +44,7 @@ def get():
     packages = str(r.content).split("\\n")[2:-2]
     for i in range(len(packages)):
         packages[i] = packages[i].split(">")[1].split("<")[0]
-    return sorted(packages)
+    return packages
 
 @eel.expose
 def search(packages, filter=[], query="", all=False):
