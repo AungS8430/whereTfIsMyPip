@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+pre {
+    min-width: 100%;
+    width: 0px;
+    overflow: auto;
+    border-radius: 15px;
+    background: #1e2939;
+    padding: 15px;
+}
