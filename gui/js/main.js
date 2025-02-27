@@ -5,7 +5,7 @@ async function run(mode) {
             installedData[i] = JSON.parse(installedData[i]);
         }
         let installed = installedData.map(pkg => pkg.name);
-        let packages = await eel.get()()
+        let packages = [];
         return [installed, packages, installedData];
     } else if (mode === "update") {
         let installedData = await eel.pip_list()();
