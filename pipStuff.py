@@ -27,18 +27,12 @@ class Version:
 
 @eel.expose
 def pip_list(python_version: Version | None=None) -> list[str]:
-    pip_arg = ["python", "-m", "pip", "list"]
+    pip_arg = ["python", "-m", "pip", "list", "--format", "json"]
     if python_version != None:
         pip_arg[0] = f"python{python_version}"
     results = subprocess.run(pip_arg, capture_output=True)
     results = results.stdout.decode('utf-8')
-    results = results.splitlines()
-    results = results[2::]
-    results = sorted(results)
-    out = []
-    for result in results:
-        out.append(json.dumps(pkgInfo(name=result.split()[0],version=result.split()[1]).__dict__))
-    return out
+    return [json.dumps(x) for x in sorted(json.loads(results), key=(lambda n: n["name"]))]
 
 @eel.expose
 def pip_install(package: str, python_version: Version | None=None) -> int | str:
