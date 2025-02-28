@@ -47,7 +47,7 @@ def get():
     return packages
 
 @eel.expose
-def search(packages, filter=[], query="", all=False):
+def search(packages, filter=[], query="", all=False, start=0):
     if all == False:
         packages = get()
     count = 0
@@ -55,15 +55,18 @@ def search(packages, filter=[], query="", all=False):
     result = []
     leng = len(query)
     temtxt = str_to_int(query, leng)
-    left = lowerBound(packages, temtxt, leng)
+    left = max(lowerBound(packages, temtxt, leng), start)
     right = upperBound(packages, temtxt, leng)
+    remain = 0
     for idx in range(left, right):
         if packages[idx] not in filter:
             result.append(packages[idx])
             count += 1
-            if count > 100:
+            if count > 30:
                 break
-    return result
+        remain = idx
+    print(f"{remain} {right}")
+    return result, remain, right
 
 @eel.expose
 def getInfo(query):
