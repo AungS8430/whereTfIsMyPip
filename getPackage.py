@@ -3,6 +3,7 @@ import requests
 import json
 import eel
 from functools import cache
+import pypandoc
 
 
 def str_to_int(txt: str, ln: int) -> int:
@@ -40,7 +41,10 @@ def upperBound(arr: list[str], target: int, leng: int):
 @eel.expose
 @cache
 def get():
-    r = requests.get("https://pypi.org/simple/")
+    try:
+        r = requests.get("https://pypi.org/simple/")
+    except:
+        return []
     packages = str(r.content).split("\\n")[2:-2]
     for i in range(len(packages)):
         packages[i] = packages[i].split(">")[1].split("<")[0]
@@ -70,7 +74,12 @@ def search(packages, filter=[], query="", all=False, start=0):
 @eel.expose
 def getInfo(query):
     try:
-        result = pkgInfo.from_dict(requests.get(f"https://pypi.org/pypi/{query}/json").json()["info"])
+        result = requests.get(f"https://pypi.org/pypi/{query}/json").json()["info"]
+        if result["description_content_type"] != "text/markdown":
+            result["description"] = pypandoc.convert_text(result["description"], 'html', format='rst')
+        else:
+            result["description"] = pypandoc.convert_text(result["description"], 'html', format='markdown')
+        result = pkgInfo.from_dict(result)
     except:
         return json.dumps(pkgInfo(name=query, summary="Error: Info not found. Return null instead.").__dict__)
     return json.dumps(result.__dict__)

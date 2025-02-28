@@ -28,7 +28,7 @@ async function main() {
 
     async function getInfo(query, installed) {
         if (!window.navigator.onLine) {
-            return JSON.parse(await eel.pip_show(query)());
+            return JSON.parse(await eel.pip_inspect(query)());
         } else {
             return JSON.parse(await eel.getInfo(query)());
         }

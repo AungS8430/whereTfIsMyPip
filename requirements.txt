@@ -1,4 +1,3 @@
-beautifulsoup4==4.13.3
 bottle==0.13.2
 bottle-websocket==0.2.9
 certifi==2025.1.31
@@ -9,11 +8,13 @@ gevent==24.11.1
 gevent-websocket==0.10.1
 greenlet==3.1.1
 idna==3.10
+Markdown==3.7
+Pygments==2.19.1
+pypandoc==1.15
+pypandoc_binary==1.15
 pyparsing==3.2.1
 requests==2.32.3
 setuptools==75.8.0
-shiboken6==6.8.2.1
-soupsieve==2.6
 typing_extensions==4.12.2
 urllib3==2.3.0
 zope.event==5.0

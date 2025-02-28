@@ -3,6 +3,7 @@ from Datastruct import pkgInfo
 from dataclasses import dataclass
 import eel
 import json
+import pypandoc
 
 @dataclass()
 class Version:
@@ -97,3 +98,25 @@ def get_all_python_version():
             out.append(Version(3, int(result.lstrip("python3."))))
     out.sort(reverse=True)
     return out
+
+@eel.expose
+def pip_inspect(package: str, python_version: Version | None=None) -> str:
+    pip_arg = ["python", "-m", "pip", "inspect"]
+    if python_version != None:
+        pip_arg[0] = f"python{python_version}"
+    results = subprocess.run(pip_arg, capture_output=True)
+    results = results.stdout.decode('utf-8')
+    results = json.loads(results)
+    results = results["installed"]
+    for itr in results:
+        if itr["metadata"]["name"] == package:
+            if not "description_content_type" in itr["metadata"]:
+                itr["metadata"]["description_content_type"] = "text/markdown"
+            if not "description" in itr["metadata"]:
+                itr["metadata"]["description"] = "Not found"
+            if itr["metadata"]["description_content_type"] == "text/markdown":
+                itr["metadata"]["description"] = pypandoc.convert_text(itr["metadata"]["description"], 'html', format='markdown')
+            else:
+                itr["metadata"]["description"] = pypandoc.convert_text(itr["metadata"]["description"], 'html', format='rst')
+            return json.dumps(pkgInfo.from_dict(itr["metadata"]).__dict__)
+    return ""
