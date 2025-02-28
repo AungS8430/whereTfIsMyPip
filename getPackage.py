@@ -65,7 +65,6 @@ def search(packages, filter=[], query="", all=False, start=0):
             if count > 30:
                 break
         remain = idx
-    print(f"{remain} {right}")
     return result, remain, right
 
 @eel.expose
