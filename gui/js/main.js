@@ -41,7 +41,7 @@ async function main() {
     });
     let wrapper = document.getElementById("wrapper");
     wrapper.addEventListener("scroll" , async (event) => {
-        if (wrapper.scrollTop / (wrapper.scrollHeight - wrapper.clientHeight) > 0.9 && wrapper.scrollHeight > wrapper.clientHeight && lastSearch < maxSearch) {console.log("a");await getMore(sQuery);}
+        if (wrapper.scrollTop / (wrapper.scrollHeight - wrapper.clientHeight) > 0.9 && wrapper.scrollHeight > wrapper.clientHeight && lastSearch < maxSearch - 1) {console.log("a");await getMore(sQuery);}
     });
 
     document.addEventListener("click", async (event) => {
