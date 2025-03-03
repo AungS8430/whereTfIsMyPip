@@ -27,6 +27,24 @@ ul {
     flex-direction: column;
     gap: 5px;
 }
+.line-block a {
+    min-width: 100%;
+    width: 0px;
+    overflow: auto;
+    padding: 5px;
+    scrollbar-width: thin;
+    display: flex;
+    flex-direction: column;
+}
+a:link {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:active {
+    text-decoration: underline;
+}
 pre > code.sourceCode {
     white-space: pre;
     position: relative;

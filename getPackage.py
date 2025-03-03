@@ -63,13 +63,13 @@ def search(packages, filter=[], query="", all=False, start=0):
     right = upperBound(packages, temtxt, leng)
     remain = 0
     for idx in range(left, right):
+        remain = idx
         if packages[idx] not in filter:
             result.append(packages[idx])
             count += 1
             if count > 30:
                 break
-        remain = idx
-    return result, remain, right
+    return result, remain + 1, right
 
 @eel.expose
 def getInfo(query):
